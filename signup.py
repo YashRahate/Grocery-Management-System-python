@@ -42,7 +42,9 @@ def login_page():
     
     else:
         try:
+
            con=pymysql.connect(host = 'localhost',user='root',password='root')
+
            mycursor=con.cursor()
         except:
             messagebox.showerror('Error','Database Connectivity Issue,Please Try Again')
@@ -76,9 +78,6 @@ def login_page():
             clear()
             Vwindow.destroy()
             import login
-
-    
-
 
 bgOriginal = Image.open('new1.png').resize((925,500))
 # bgImage = ImageTk.PhotoImage(bgOriginal)
