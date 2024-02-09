@@ -42,7 +42,7 @@ def login_page():
     
     else:
         try:
-           con=pymysql.connect(host = 'localhost',user='root',password='travelmanagement')
+           con=pymysql.connect(host = 'localhost',user='root',password='root')
            mycursor=con.cursor()
         except:
             messagebox.showerror('Error','Database Connectivity Issue,Please Try Again')
