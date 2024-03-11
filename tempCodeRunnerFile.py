@@ -1,1 +1,0 @@
-uantityv*sellingp
