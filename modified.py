@@ -12,6 +12,8 @@ mwindow=Tk()
 mwindow.title=('Grocery Management System')
 mwindow.geometry('1440x750+50+20')
 
+    
+    
 def merge_billing_data():
     merged_data = {}
     for item in billing_table.get_children():
@@ -33,6 +35,7 @@ def merge_billing_data():
     # Clear existing data in billing table
     for item in billing_table.get_children():
         billing_table.delete(item)
+        
     
     # Insert merged data into billing table
     for data in merged_data.values():
@@ -57,7 +60,30 @@ def sell_detail():
     
     query='use crud'
     mycursor.execute(query)
-    tamount=0
+    for row in billing_table.get_children():
+        # Extract data from the treeview
+        name_of_product = billing_table.item(row)['values'][0]
+        query="select quantity from finaldbt where name=%s"
+        mycursor.execute(query,name_of_product)
+        pquantity=mycursor.fetchone()
+        quantint1=int(pquantity[0])
+        
+        quantity = billing_table.item(row)['values'][2]
+        quantint2=int(quantity)
+        finalquantity=quantint1-quantint2
+        # Execute SQL update statement
+        sql = "UPDATE finaldbt SET quantity = %s WHERE name = %s"
+        val = (finalquantity, name_of_product)
+        mycursor.execute(sql, val)
+
+    con.commit()    
+    fetch_data()    
+    con.close()
+    messagebox.showinfo('Sucsess',' Product SOLD')
+    clear_entryfield
+    for item in billing_table.get_children():
+        billing_table.delete(item)
+    
     
     
     
@@ -635,7 +661,7 @@ fetch_data()
 # grandtotal=Button(mwindow,width=15,pady=7,text='Total',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=total_sum(billing_table,column_index))
 # grandtotal.place(x=1200,y=610)
 
-sell=Button(mwindow,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white')
+sell=Button(mwindow,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=sell_detail)
 sell.place(x=1237,y=670)
 #add new invoice button and solve the glich of entry fields
 
