@@ -15,16 +15,12 @@ def on_vertical_scroll(*args):
 
 def on_horizontal_scroll(*args):
     outputframe.xview(*args)
-    
-    
-    
+
 def delete_details():
     con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
     mycursor= con.cursor()
-    
     query='use crud'
     mycursor.execute(query)
-    
     query="delete from finaldbt where name =%s"
     mycursor.execute(query,name.get())
     con.commit()
@@ -36,10 +32,7 @@ def delete_details():
     quan.delete(0,END)
     exd.delete(0,END)
     fetch_data()
-    
     con.close()
-    
-    
 
 def add_details():
     try:
@@ -50,12 +43,8 @@ def add_details():
         return
     query='use crud'
     mycursor.execute(query)
-    
-    
     query='select * from finaldbt where name=%s'
-
     mycursor.execute(query,(name.get()))
-
     row=mycursor.fetchone()
     if row != None:
         messagebox.showerror('Error','Product Already Exist')
@@ -66,8 +55,6 @@ def add_details():
         sp_value = float(sp.get())  
         quan_value = int(quan.get())  
         stotal = sp_value * quan_value
-
-        
         query='insert into finaldbt(name ,w_name,w_contact,c_price,s_price,quantity,ex_date,c_total,s_total) values(%s,%s,%s,%s,%s,%s,%s,%s,%s)'
         mycursor.execute(query,(name.get(),w_name.get(),w_contact.get(),cp.get(),sp.get(),quan.get(),exd.get(),ctotal,stotal ))
         con.commit()
@@ -78,10 +65,8 @@ def add_details():
 def fetch_data():
     con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
     mycursor= con.cursor()
-    
     query='use crud'
     mycursor.execute(query)
-    
     query="select * from finaldbt"
     mycursor.execute(query)
     row=mycursor.fetchall()
@@ -96,15 +81,12 @@ def fetch_data():
 def get_cursor(event=''):
     update=Button(outputframe1,width=25,pady=7,text='UPDATE',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=update_details)
     update.grid(row=8,column=2)
-    
     delete=Button(outputframe1,width=25,pady=7,text='delete',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=delete_details)
     delete.grid(row=8,column=1)
     con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
     mycursor= con.cursor()
-    
     query='use crud'
     mycursor.execute(query)
-    
     cursor_row=product_table.focus()
     content=product_table.item(cursor_row)
     rowss=content["values"]
@@ -115,9 +97,6 @@ def get_cursor(event=''):
     sp.delete(0,END)
     quan.delete(0,END)
     exd.delete(0,END)
-    
-    
-    
     name.insert(0,rowss[0])
     w_name.insert(0,rowss[1])
     w_contact.insert(0,rowss[2])
@@ -126,16 +105,11 @@ def get_cursor(event=''):
     quan.insert(0,rowss[5])
     exd.insert(0,rowss[9])
     
-   
-    
-    
 def update_details():
     con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
     mycursor= con.cursor()
-    
     query='use crud'
     mycursor.execute(query)
-    
     query='update finaldbt set w_name=%s,w_contact=%s,c_price=%s,s_price=%s,quantity=%s,ex_date=%s where name=%s'
     mycursor.execute(query,(w_name.get(),w_contact.get(),cp.get(),sp.get(),quan.get(),exd.get(),name.get()))
     con.commit()
@@ -150,34 +124,17 @@ def open_cal():
         exd.insert(0,selected_date)
         root.destroy()
         select.config(state=tk.NORMAL)
-      
-        
-    
     # You can do whatever you want with the selected date, such as updating a label or entry field
-
     root = tk.Tk()
     root.title("Date Picker")
-
     cal = Calendar(root, selectmode="day", date_pattern="yyyy-mm-dd")
     cal.pack(padx=10, pady=10)
-
     btn=Button(root, text="Get Date", command=get_date)
     btn.pack(pady=5)
-    
-
     root.mainloop()
       
-    
-        
-    
-    
-    
-    
-    
-
 outputframe=Frame(mwindow,bd=10,relief=RIDGE)
 outputframe.place(x=0,y=10,width=700,height=650)
-
 outputframe1=Frame(mwindow,bd=10,relief=RIDGE)
 outputframe1.place(x=750,y=10,width=600,height=350)
 scroll_x=ttk.Scrollbar(outputframe,orient=HORIZONTAL, command=on_vertical_scroll)
@@ -187,9 +144,9 @@ product_table=ttk.Treeview(outputframe,columns=("NameofProduct","wholesellername
 
 scroll_x.pack(side=BOTTOM,fill=X)
 scroll_y.pack(side=RIGHT,fill=Y)
-
 scroll_x=ttk.Scrollbar(command=product_table.xview)
 scroll_y=ttk.Scrollbar(command=product_table.yview)
+
 product_table.heading("NameofProduct",text="PRODUCT")
 product_table.heading("wholesellername",text="WHOLESELLER NAME ")
 product_table.heading("wholesellercontact",text="WHOLESELLER CONTACT")
@@ -222,13 +179,10 @@ lb.grid(row=0,column=0)
 name = Entry(outputframe1,width=30,fg='black',border=2,bg="white",textvariable=1,font=('Microsoft Yahei UI',10))
 name.grid(row=0,column=1)
 
-
-
 lb1=Label(outputframe1,text='Quantity:')
 lb1.grid(row=5,column=0)
 quan = Entry(outputframe1,width=30,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 quan.grid(row=5,column=1)
-
 
 lb2=Label(outputframe1,text='Cost price:')
 lb2.grid(row=3,column=0)
@@ -254,15 +208,13 @@ lb6=Label(outputframe1,text="Expiry date:")
 lb6.grid(row=6,column=0)
 exd = Entry(outputframe1,width=30,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 exd.grid(row=6,column=1)
+
 select=Button(outputframe1,width=10,text='select',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=open_cal)
 select.grid(row=6,column=2)
-
-
 
 add=Button(outputframe1,width=25,pady=7,text='ADD',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=add_details)
 add.grid(row=8,column=0)
 
 name.bind('<Return>',lambda event:w_name.focus() )
-
 
 mwindow.mainloop()
