@@ -43,11 +43,9 @@ def merge_billing_data():
             data['total']
         ))
 
-def on_vertical_scroll(*args):
-    outputframe.yview(*args)
 
-def on_horizontal_scroll(*args):
-    outputframe.xview(*args)
+
+
 
 def sell_detail():   
     con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
@@ -377,18 +375,31 @@ c_contactl.grid(row=1,column=0,padx=20)
 c_contacte = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 c_contacte.grid(row=1,column=1)
 
-scroll_x=ttk.Scrollbar(outputframe,orient=HORIZONTAL, command=on_vertical_scroll)
-scroll_y=ttk.Scrollbar(outputframe,orient=VERTICAL ,command=on_horizontal_scroll)
-scroll_x2=ttk.Scrollbar(outputframe2,orient=HORIZONTAL, command=on_vertical_scroll)
-scroll_y2=ttk.Scrollbar(outputframe2,orient=VERTICAL ,command=on_horizontal_scroll)
-scroll_x2.pack(side=BOTTOM,fill=X)
-scroll_y2.pack(side=RIGHT,fill=Y)
-product_table=ttk.Treeview(outputframe,columns=("name_of_product","sellingprice","quantity","sellingpricetotal","discount","exdate"),xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+# scroll_x=ttk.Scrollbar(outputframe,orient=HORIZONTAL, command=on_vertical_scroll)
+# scroll_y=ttk.Scrollbar(outputframe,orient=VERTICAL ,command=on_horizontal_scroll)
+# scroll_x2=ttk.Scrollbar(outputframe2,orient=HORIZONTAL, command=on_vertical_scroll)
+# scroll_y2=ttk.Scrollbar(outputframe2,orient=VERTICAL ,command=on_horizontal_scroll)
+# scroll_x2.pack(side=BOTTOM,fill=X)
+# scroll_y2.pack(side=RIGHT,fill=Y)
+product_table=ttk.Treeview(outputframe,columns=("name_of_product","sellingprice","quantity","sellingpricetotal","discount","exdate"))
 
-scroll_x.pack(side=BOTTOM,fill=X)
-scroll_y.pack(side=RIGHT,fill=Y)
-scroll_x=ttk.Scrollbar(command=product_table.xview)
-scroll_y=ttk.Scrollbar(command=product_table.yview)
+vsbp = ttk.Scrollbar(outputframe, orient="vertical", command=product_table.yview)
+vsbp.pack(side="right", fill="y")
+product_table.configure(yscrollcommand=vsbp.set)
+
+hsbp = ttk.Scrollbar(outputframe, orient="horizontal", command=product_table.xview)
+hsbp.pack(side="bottom", fill="x")
+product_table.configure(xscrollcommand=hsbp.set)
+
+
+
+
+
+
+# scroll_x.pack(side=BOTTOM,fill=X)
+# scroll_y.pack(side=RIGHT,fill=Y)
+# scroll_x=ttk.Scrollbar(command=product_table.xview)
+# scroll_y=ttk.Scrollbar(command=product_table.yview)
 
 product_table.heading("name_of_product",text="PRODUCT")
 product_table.heading("sellingprice",text="SELLING PRICE")
@@ -448,15 +459,22 @@ delete.place(x=325,y=610)
 print=Button(mwindow,width=15,pady=7,text='print',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=generate_invoice)
 print.place(x=1237,y=630)
 
-billing_table=ttk.Treeview(outputframe2,columns=("name_of_product","sellingprice","quantity","discount","exdate","total"),xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+billing_table=ttk.Treeview(outputframe2,columns=("name_of_product","sellingprice","quantity","discount","exdate","total"))
 
-scroll_x.pack(side=BOTTOM,fill=X)
-scroll_y.pack(side=RIGHT,fill=Y)
-scroll_x=ttk.Scrollbar(command=billing_table.xview)
-scroll_y=ttk.Scrollbar(command=billing_table.yview)
+vsbb = ttk.Scrollbar(outputframe2, orient="vertical", command=billing_table.yview)
+vsbb.pack(side="right", fill="y")
+billing_table.configure(yscrollcommand=vsbb.set)
 
-scroll_x2.pack(side=BOTTOM,fill=X)
-scroll_y2.pack(side=RIGHT,fill=Y)
+hsbb = ttk.Scrollbar(outputframe2, orient="horizontal", command=billing_table.xview)
+hsbb.pack(side="bottom", fill="x")
+billing_table.configure(xscrollcommand=hsbb.set)
+# scroll_x.pack(side=BOTTOM,fill=X)
+# scroll_y.pack(side=RIGHT,fill=Y)
+# scroll_x=ttk.Scrollbar(command=billing_table.xview)
+# scroll_y=ttk.Scrollbar(command=billing_table.yview)
+
+# scroll_x2.pack(side=BOTTOM,fill=X)
+# scroll_y2.pack(side=RIGHT,fill=Y)
 scroll_x2=ttk.Scrollbar(command=billing_table.xview)
 scroll_y2=ttk.Scrollbar(command=billing_table.yview)
 
