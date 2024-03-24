@@ -49,7 +49,7 @@ def on_horizontal_scroll(*args):
     outputframe.xview(*args)
 
 def sell_detail():   
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -117,7 +117,7 @@ def sell_detail():
         billing_table.delete(item)
     
 def delete_details():
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -163,7 +163,7 @@ def clear_entryfield():
         
 def add_details():
     try:
-        con=pymysql.connect(host='localhost',user='root',password='root')
+        con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
         mycursor= con.cursor()
     except:
         messagebox.showerror("Error",'Connection Failed With Database')
@@ -215,7 +215,7 @@ def add_details():
     clear_entryfield()
 
 def search():
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -252,7 +252,7 @@ def search():
 
 def fetch_data():
 
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -269,7 +269,7 @@ def fetch_data():
     
 def get_cursor(event=''):
 
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -290,7 +290,7 @@ def get_cursor(event=''):
 
 def get_cursor2(event=''):
 
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)
@@ -309,7 +309,7 @@ def get_cursor2(event=''):
     exd.insert(0,rowss[4])  
    
 def update_details():
-    con=pymysql.connect(host='localhost',user='root',password='root')
+    con=pymysql.connect(host='localhost',user='root',password='ajinkya@123')
     mycursor= con.cursor()
     query='use crud'
     mycursor.execute(query)

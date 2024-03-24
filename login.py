@@ -24,7 +24,7 @@ def login_user():
         messagebox.showerror('Error', 'All Fields Are Required')
     else:
         try:
-            con = pymysql.connect(host='localhost', user='root', password='root')
+            con = pymysql.connect(host='localhost', user='root', password='ajinkya@123')
             mycursor = con.cursor()
         except:
             messagebox.showerror("Error", 'Connection Failed With Database')
@@ -49,7 +49,7 @@ def forgot_password():
         elif code.get() != conf.get():
             messagebox.showerror("Error", 'New password and Confirm password MISMATCH!')
         else:
-            con = pymysql.connect(host='localhost', user='root', password='root', database='userdata')
+            con = pymysql.connect(host='localhost', user='root', password='ajinkya@123', database='userdata')
             mycursor = con.cursor()
             query = 'select * from dataofuser where name=%s'
 
