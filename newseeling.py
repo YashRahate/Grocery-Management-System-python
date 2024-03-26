@@ -8,21 +8,29 @@ from tkcalendar import Calendar
 import tkinter as tk
 from docxtpl import DocxTemplate
 
+
 mwindow=Tk()
 mwindow.title=('Grocery Management System')
 mwindow.geometry('1440x750+50+20')
-def deselect(event=None):                   ##addkr
-    selected_item = product_table.selection()
-    if selected_item:
-        product_table.selection_remove(selected_item)
 
-def on_click_outside(event):
-    # Check if the click occurred outside of the treeview
-    if event.widget != product_table:
-        deselect()
-mwindow.bind("<Button-1>", on_click_outside)
-#clearfields
 
+canvas = Canvas(mwindow)
+canvas.pack(side="left", fill="both", expand=True)
+
+bapframe = Frame(canvas, bd=10)
+canvas.create_window((0, 0), window=bapframe, anchor="nw")
+bapframe.config(width=1440, height=750)  # Set the size of the frame
+bapframe.pack_propagate(False)  # Prevent the frame from resizing to its contents
+
+# Vertical scrollbar
+vsb = Scrollbar(mwindow, orient="vertical", command=canvas.yview)
+vsb.pack(side="right", fill="y")
+canvas.configure(yscrollcommand=vsb.set)
+
+# Horizontal scrollbar
+hsb = Scrollbar(mwindow, orient="horizontal", command=canvas.xview)
+hsb.pack(side="bottom", fill="x")
+canvas.configure(xscrollcommand=hsb.set)
 
 def merge_billing_data():
     merged_data = {}
@@ -54,8 +62,6 @@ def merge_billing_data():
             data['exdate'],
             data['total']
         ))
-
-
 
 
 
@@ -233,7 +239,7 @@ def search():
     search_term = searche.get()
     if search_term:
         # Clear the current content of the treeview
-        query="select name,s_price,quantity,s_total,discount,ex_date from finaldbt"             #
+        query="select * from finaldbt"
         mycursor.execute(query)
         row=mycursor.fetchall()
         if len(row)!=0:
@@ -241,30 +247,17 @@ def search():
         # for row in product_table.get_children():
         #     product_table.delete(row)
         # Execute SQL query to fetch names matching the search term
-        mycursor.execute("SELECT name,s_price,quantity,s_total,discount,ex_date FROM finaldbt WHERE name LIKE %s", (f'%{search_term}%',))#
+        mycursor.execute("SELECT * FROM finaldbt WHERE name LIKE %s", (f'%{search_term}%',))
         row=mycursor.fetchall()
-        
         if len(row)!=0:
             product_table.delete(*product_table.get_children())
             for i in row:
                 product_table.insert("",END,values=i)
             con.commit()
-        else:
-            messagebox.showerror("INVALID SEARCH","NO ITEM IN INVENTORY")
-            searche.delete(0,END)
-            query="select name,s_price,quantity,s_total,discount,ex_date from finaldbt"
-            mycursor.execute(query)
-            row=mycursor.fetchall()
-            if len(row)!=0:
-                product_table.delete(*product_table.get_children())
-                for i in row:
-                    product_table.insert("",END,values=i)
-                con.commit()
-            con.close() 
-        
+        con.close() 
     else:
         
-        query="select name,s_price,quantity,s_total,discount,ex_date from finaldbt"#
+        query="select * from finaldbt"
         mycursor.execute(query)
         row=mycursor.fetchall()
         if len(row)!=0:
@@ -370,24 +363,24 @@ def update_details():
     
     clear_entryfield() 
       
-head=Label(mwindow,text="BILLING SECTION")
+head=Label(bapframe,text="BILLING SECTION")
 head.place(x=720,y=0)
-head1=Label(mwindow,text="SELECT PRODUCTS TO BE SOLD")
+head1=Label(bapframe,text="SELECT PRODUCTS TO BE SOLD")
 head1.place(x=100,y=30)
-outputframe=Frame(mwindow,bd=10,relief=RIDGE)
+outputframe=Frame(bapframe,bd=10,relief=RIDGE)
 outputframe.place(x=20,y=50,width=1400,height=200)
-head2=Label(mwindow,text="SEARCH : ")
+head2=Label(bapframe,text="SEARCH : ")
 head2.place(x=20,y=265)
-searche = Entry(mwindow,width=48,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
+searche = Entry(bapframe,width=48,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 searche.place(x=100,y=265)
-searchb=Button(mwindow,width=10,text='SEARCH',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=search)
+searchb=Button(bapframe,width=10,text='SEARCH',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=search)
 searchb.place(x=500,y=265)
 
-outputframe1=Frame(mwindow,bd=10,relief=GROOVE)
+outputframe1=Frame(bapframe,bd=10,relief=GROOVE)
 outputframe1.place(x=700,y=265,width=600,height=100)
-outputframe2=Frame(mwindow,bd=10,relief=RIDGE)
+outputframe2=Frame(bapframe,bd=10,relief=RIDGE)
 outputframe2.place(x=20,y=400,width=1400,height=200)
-outputframe3=Frame(mwindow,bd=4,relief=RIDGE,pady=6)
+outputframe3=Frame(bapframe,bd=4,relief=RIDGE,pady=6)
 outputframe3.place(x=800,y=620,height=80,width=400)
 
 c_namel=Label(outputframe3,text='Name of customer:',bd=0)
@@ -400,12 +393,7 @@ c_contactl.grid(row=1,column=0,padx=20)
 c_contacte = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 c_contacte.grid(row=1,column=1)
 
-# scroll_x=ttk.Scrollbar(outputframe,orient=HORIZONTAL, command=on_vertical_scroll)
-# scroll_y=ttk.Scrollbar(outputframe,orient=VERTICAL ,command=on_horizontal_scroll)
-# scroll_x2=ttk.Scrollbar(outputframe2,orient=HORIZONTAL, command=on_vertical_scroll)
-# scroll_y2=ttk.Scrollbar(outputframe2,orient=VERTICAL ,command=on_horizontal_scroll)
-# scroll_x2.pack(side=BOTTOM,fill=X)
-# scroll_y2.pack(side=RIGHT,fill=Y)
+
 product_table=ttk.Treeview(outputframe,columns=("name_of_product","sellingprice","quantity","sellingpricetotal","discount","exdate"))
 
 vsbp = ttk.Scrollbar(outputframe, orient="vertical", command=product_table.yview)
@@ -415,16 +403,6 @@ product_table.configure(yscrollcommand=vsbp.set)
 hsbp = ttk.Scrollbar(outputframe, orient="horizontal", command=product_table.xview)
 hsbp.pack(side="bottom", fill="x")
 product_table.configure(xscrollcommand=hsbp.set)
-
-
-
-
-
-
-# scroll_x.pack(side=BOTTOM,fill=X)
-# scroll_y.pack(side=RIGHT,fill=Y)
-# scroll_x=ttk.Scrollbar(command=product_table.xview)
-# scroll_y=ttk.Scrollbar(command=product_table.yview)
 
 product_table.heading("name_of_product",text="PRODUCT")
 product_table.heading("sellingprice",text="SELLING PRICE")
@@ -473,15 +451,15 @@ exd.grid(row=2,column=1)
 add=Button(outputframe1,width=20,padx=12,pady=0,text='ADD',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=add_details)
 add.place(x=300,y=52)
 
-update=Button(mwindow,width=15,pady=7,text='UPDATE',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=update_details)
+update=Button(bapframe,width=15,pady=7,text='UPDATE',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=update_details)
 update.place(x=50,y=610)
-updatequantity=Entry(mwindow,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
+updatequantity=Entry(bapframe,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
 updatequantity.place(x=180,y=620)
 
-delete=Button(mwindow,width=15,pady=7,text='delete',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=delete_details)
+delete=Button(bapframe,width=15,pady=7,text='delete',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=delete_details)
 delete.place(x=325,y=610)
 
-print=Button(mwindow,width=15,pady=7,text='print',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=generate_invoice)
+print=Button(bapframe,width=15,pady=7,text='print',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=generate_invoice)
 print.place(x=1237,y=630)
 
 billing_table=ttk.Treeview(outputframe2,columns=("name_of_product","sellingprice","quantity","discount","exdate","total"))
@@ -493,15 +471,6 @@ billing_table.configure(yscrollcommand=vsbb.set)
 hsbb = ttk.Scrollbar(outputframe2, orient="horizontal", command=billing_table.xview)
 hsbb.pack(side="bottom", fill="x")
 billing_table.configure(xscrollcommand=hsbb.set)
-# scroll_x.pack(side=BOTTOM,fill=X)
-# scroll_y.pack(side=RIGHT,fill=Y)
-# scroll_x=ttk.Scrollbar(command=billing_table.xview)
-# scroll_y=ttk.Scrollbar(command=billing_table.yview)
-
-# scroll_x2.pack(side=BOTTOM,fill=X)
-# scroll_y2.pack(side=RIGHT,fill=Y)
-scroll_x2=ttk.Scrollbar(command=billing_table.xview)
-scroll_y2=ttk.Scrollbar(command=billing_table.yview)
 
 billing_table.heading("name_of_product",text="PRODUCT")
 billing_table.heading("sellingprice",text="SELLING PRICE")
@@ -522,7 +491,7 @@ billing_table.pack(fill=BOTH,expand=1)
 billing_table.bind("<ButtonRelease-1>",get_cursor2)
 fetch_data()
 
-sell=Button(mwindow,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=sell_detail)
+sell=Button(bapframe,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=sell_detail)
 sell.place(x=1237,y=670)
 
 mwindow.mainloop()

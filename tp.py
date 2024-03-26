@@ -1,26 +1,36 @@
+from tkinter import Tk, ttk
 
-billing_table=ttk.Treeview(outputframe,columns=("NameofProduct","sellingprice","quantity","sellingpricetotal","discount","exdate"),xscrollcommand=scroll_x.set,yscrollcommand=scroll_y.set)
+def deselect(event=None):
+    selected_item = product_table.selection()
+    if selected_item:
+        product_table.selection_remove(selected_item)
 
-scroll_x.pack(side=BOTTOM,fill=X)
-scroll_y.pack(side=RIGHT,fill=Y)
+def on_select(event):
+    deselect_button.config(state="normal")
 
-scroll_x=ttk.Scrollbar(command=billing_table.xview)
-scroll_y=ttk.Scrollbar(command=billing_table.yview)
-billing_table.heading("NameofProduct",text="PRODUCT")
-billing_table.heading("sellingprice",text="SELLING PRICE")
-billing_table.heading("quantity",text="QUANTITY") 
-billing_table.heading("sellingpricetotal",text="SELLING PRICE TOTAL") 
-billing_table.heading("discount",text="DISCOUNT") 
-billing_table.heading("exdate",text="EXPIRY DATE") 
+def on_click_outside(event):
+    # Check if the click occurred outside of the treeview
+    if event.widget != product_table:
+        deselect()
 
-billing_table["show"]="headings"
-billing_table.column("NameofProduct",width=100)
-billing_table.column("sellingprice",width=75)
-billing_table.column("quantity",width=50)
-billing_table.column("sellingpricetotal",width=75)
-billing_table.column("discount",width=50)
-billing_table.column("exdate",width=75)
-billing_table.pack(fill=BOTH,expand=1)
+mwindow = Tk()
+mwindow.title('Grocery Management System')
+mwindow.geometry('600x400')
 
-billing_table.bind("<ButtonRelease-1>",get_cursor)
-fetch_data()
+product_table = ttk.Treeview(mwindow)
+product_table.pack(pady=10, padx=10)
+
+# Insert some sample data into the treeview
+for i in range(10):
+    product_table.insert("", "end", text=f"Item {i}")
+
+deselect_button = ttk.Button(mwindow, text="Deselect", command=deselect, state="disabled")
+deselect_button.pack()
+
+# Bind the select event to call on_select function
+product_table.bind("<<TreeviewSelect>>", on_select)
+
+# Bind the click event to call on_click_outside function
+mwindow.bind("<Button-1>", on_click_outside)
+
+mwindow.mainloop()
