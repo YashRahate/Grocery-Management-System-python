@@ -18,6 +18,10 @@ def pro_open():
     window.destroy()
     import profile
 
+def graph_open():
+    window.destroy()
+    import graph1
+
 bgOriginal = Image.open('newbg.png').resize((925,500))
         # bgImage = ImageTk.PhotoImage(bgOriginal)
         # bgLabel=Label(fwindow,image=bgImage)
@@ -44,7 +48,7 @@ Button(window,image=img3,border=10,bg='teal',activebackground='#356466').place(x
 
 bgOriginal4 = Image.open('stats.png').resize((275,155))
 img4 =ImageTk.PhotoImage(bgOriginal4)
-Button(window,image=img4,border=10,bg='teal',activebackground='#356466').place(x=15,y=265)
+Button(window,image=img4,border=10,bg='teal',activebackground='#356466',command = graph_open).place(x=15,y=265)
 
 bgOriginal5 = Image.open('bill.png').resize((275,155))
 img5 =ImageTk.PhotoImage(bgOriginal5)
