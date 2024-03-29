@@ -8,9 +8,10 @@ from tkcalendar import Calendar
 import tkinter as tk
 from docxtpl import DocxTemplate
 
+#########FAILED I THINK I SHOUL IMPORT because you have to first press the bill button  AZ
 
 mwindow=Tk()
-mwindow.title=('Billing')
+mwindow.title('Billing')
 mwindow.geometry('1440x750+50+20')
 # bgOriginal = Image.open('new1.png').resize((1440,750))
 #         # bgImage = ImageTk.PhotoImage(bgOriginal)
@@ -22,6 +23,233 @@ bgOriginal = Image.open('newbg.png').resize((1500,750))
 img =ImageTk.PhotoImage(bgOriginal)
 Label(mwindow,image=img,border=0,bg='white').place(x=0,y=0)
 
+
+
+
+def open_bill_windo():
+    global billing_table
+    bill_window = tk.Toplevel(mwindow)
+    bill_window.title("BILL Window")
+    bill_window.geometry('1440x700+50+50')
+    
+    def update_details():
+        con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+        mycursor= con.cursor()
+        query='use crud'
+        mycursor.execute(query)
+        # Get the currently selected item
+        selected_item = billing_table.focus()
+        query="select discount from finaldbt where name=%s"
+        mycursor.execute(query,name.get())
+        discountv=mycursor.fetchone()
+        if updatequantity.get()=='':
+            messagebox.showerror("Error",'Please Enter The Quantity')
+            return
+        namev=name.get()
+        quantityv=updatequantity.get()
+        query="select quantity from finaldbt where name=%s"
+        mycursor.execute(query,name.get())
+        quantityq=mycursor.fetchone()
+        quantint=int(quantityq[0])
+        quantinte=int(quantityv)
+        if quantint < quantinte :
+            messagebox.showerror('Error','NOT ENOUGH STOCK(REENTER QUANTITY)')
+            return
+        query="select discount from finaldbt where name=%s"
+        mycursor.execute(query,name.get())
+        discountv=mycursor.fetchone()
+        sellingp=sp.get()
+        query="select ex_date from finaldbt where name=%s"
+        mycursor.execute(query,name.get())
+        date=mycursor.fetchone()
+        total=float(quantityv) * float(sellingp)
+        # Update the values of the selected item
+        if selected_item:
+            billing_table.item(selected_item, values=(namev, sp.get(), updatequantity.get(),discountv,date,total))
+        billing_table.selection_remove(billing_table.selection())
+        messagebox.showinfo('Sucsess',' Item UPDATED Successfully')
+        clear_entryfieldbw()
+    
+    def delete_details():
+        con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+        mycursor= con.cursor()
+        query='use crud'
+        mycursor.execute(query)
+        # Get the currently selected item
+        selected_item = billing_table.focus()
+        # Delete the selected item
+        if selected_item:
+            billing_table.delete(selected_item)
+        messagebox.showinfo('Sucsess',' Item DELETED Successfully')
+    
+    def generate_invoice():
+        if c_contacte.get()=='' or c_namee.get()=="":
+            messagebox.showerror("Error",'Please Enter The Name and Contact of the Customer')
+            return
+        doc = DocxTemplate("miniproject.docx")
+        i_name= c_namee.get()
+        i_contact= c_contacte.get()
+        data = []
+        for item in billing_table.get_children():
+            values = billing_table.item(item, 'values')
+            data.append(list(values))
+        # Assuming item[5] contains string representations of numbers
+        subtotal = sum(float(item[5]) for item in data)
+        salestax = 0.18   #18%
+        subttotal = subtotal * (1 + salestax)
+        doc.render({"name":i_name,
+                    "phone":i_contact,
+                    "invoice_list":data,
+                    "subtotal":subtotal,
+                    "salestax":"18%",
+                    "total":subttotal})
+        doc_name = "new_invoice" + str(i_name) + datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S") + ".docx"
+        doc.save(doc_name)
+        messagebox.showinfo("Invoice Complete", "Invoice Complete")
+        data.clear
+        
+    def clear_entryfieldbw():
+        # quan.delete(0,END)
+        # name.delete(0,END)
+        # stotal.delete(0,END)
+        # sp.delete(0,END)
+        # exd.delete(0,END)
+        updatequantity.delete(0,END)
+        c_contacte.delete(0,END)
+        c_namee.delete(0,END)
+    
+    
+    def sell_detail():   
+        con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+        mycursor= con.cursor()
+        query='use crud'
+        mycursor.execute(query)
+        # query="DELETE FROM graph WHERE date = CURDATE() "
+        if not billing_table.get_children():
+            messagebox.showerror("ERROR",'Billing Table Empty')
+            return
+        if c_contacte.get()=='' or c_namee.get()=="":
+            messagebox.showerror("Error",'Please Enter The Name and Contact of the Customer')
+            return
+        try:
+            query="INSERT INTO graph (date,profit,loss,nos) VALUES (CURDATE(),0.0,0.0,0)"
+            mycursor.execute(query)
+        except:
+            messagebox.showinfo("INFO",'Press OK to Confirm')
+        
+        for row in billing_table.get_children():
+            # Extract data from the treeview
+            name_of_product = billing_table.item(row)['values'][0]
+            
+            query="select c_price from finaldbt where name=%s"
+            mycursor.execute(query,name_of_product)
+            cp=mycursor.fetchone()
+            cp_f=float(cp[0])
+            
+            query="select s_price from finaldbt where name=%s"
+            mycursor.execute(query,name_of_product)
+            sp=mycursor.fetchone()
+            sp_f=float(sp[0])
+            
+            
+            query="select quantity from finaldbt where name=%s"
+            mycursor.execute(query,name_of_product)
+            pquantity=mycursor.fetchone()
+            quantint1=int(pquantity[0])
+            
+            quantity = billing_table.item(row)['values'][2]
+            quantint2=int(quantity)
+            finalquantity=quantint1-quantint2
+            profit_f=(sp_f-cp_f)*quantint2
+            # Execute SQL update statement
+            sql = "UPDATE finaldbt SET quantity = %s WHERE name = %s"
+            val = (finalquantity, name_of_product)
+            mycursor.execute(sql, val)
+            query="select profit from graph where date = CURDATE() "
+            mycursor.execute(query)
+            profit_t=mycursor.fetchone()
+            profit_tf=float(profit_t[0])
+            query="select nos from graph where date = CURDATE() "
+            mycursor.execute(query)
+            nos_t=mycursor.fetchone()
+            nos_tf=int(nos_t[0])
+            final_nos = nos_tf + 1
+            final_nos_f = final_nos
+            final_profit= profit_f + profit_tf
+            final_profit_f=float(final_profit)
+            sql = "UPDATE graph SET profit = %s WHERE date = CURDATE() "
+            val = (final_profit_f)
+            mycursor.execute(sql, val)
+            sql = "UPDATE graph SET nos = %s WHERE date = CURDATE() "
+            val = (final_nos_f)
+            mycursor.execute(sql, val)
+        con.commit()    
+        fetch_data()    
+        con.close()
+        messagebox.showinfo('Sucsess',' Product SOLD')
+        clear_entryfieldbw
+        for item in billing_table.get_children():
+            billing_table.delete(item)
+    
+    outputframe2=Frame(bill_window,bd=10,relief=RIDGE)
+    outputframe2.place(x=20,y=200,width=1400,height=200)
+    outputframe3=Frame(bill_window,bd=4,relief=RIDGE,pady=6)
+    outputframe3.place(x=800,y=420,height=80,width=400)
+
+    c_namel=Label(outputframe3,text='Name of customer:',bd=0)
+    c_namel.grid(row=0,column=0,padx=20)
+    c_namee = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
+    c_namee.grid(row=0,column=1)
+
+    c_contactl=Label(outputframe3,text='Customer contact:',bd=0)
+    c_contactl.grid(row=1,column=0,padx=20)
+    c_contacte = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
+    c_contacte.grid(row=1,column=1)
+    
+    update=Button(bill_window,width=15,pady=7,text='UPDATE',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=update_details)
+    update.place(x=50,y=410)
+    updatequantity=Entry(bill_window,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
+    updatequantity.place(x=180,y=420)
+
+    delete=Button(bill_window,width=15,pady=7,text='delete',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=delete_details)
+    delete.place(x=425,y=410)
+
+    print=Button(bill_window,width=15,pady=7,text='print',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=generate_invoice)
+    print.place(x=1237,y=430)
+
+    billing_table=ttk.Treeview(outputframe2,columns=("name_of_product","sellingprice","quantity","discount","exdate","total"))
+
+    vsbb = ttk.Scrollbar(outputframe2, orient="vertical", command=billing_table.yview)
+    vsbb.pack(side="right", fill="y")
+    billing_table.configure(yscrollcommand=vsbb.set)
+
+    hsbb = ttk.Scrollbar(outputframe2, orient="horizontal", command=billing_table.xview)
+    hsbb.pack(side="bottom", fill="x")
+    billing_table.configure(xscrollcommand=hsbb.set)
+
+    billing_table.heading("name_of_product",text="PRODUCT")
+    billing_table.heading("sellingprice",text="SELLING PRICE")
+    billing_table.heading("quantity",text="QUANTITY") 
+    billing_table.heading("total",text="TOTAL") 
+    billing_table.heading("discount",text="DISCOUNT") 
+    billing_table.heading("exdate",text="EXPIRY DATE") 
+
+    billing_table["show"]="headings"
+    billing_table.column("name_of_product",width=100)
+    billing_table.column("sellingprice",width=75)
+    billing_table.column("quantity",width=50)
+    billing_table.column("total",width=75)
+    billing_table.column("discount",width=50)
+    billing_table.column("exdate",width=75)
+    billing_table.pack(fill=BOTH,expand=1)
+
+    billing_table.bind("<ButtonRelease-1>",get_cursor2)
+    fetch_data()
+
+    sell=Button(bill_window,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=sell_detail)
+    sell.place(x=1237,y=470)
+    
+    
 
 def merge_billing_data():
     merged_data = {}
@@ -54,131 +282,23 @@ def merge_billing_data():
             data['total']
         ))
 
-def on_vertical_scroll(*args):
-    outputframe.yview(*args)
-def on_horizontal_scroll(*args):
-    outputframe.xview(*args)
 
-def sell_detail():   
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
-    mycursor= con.cursor()
-    query='use crud'
-    mycursor.execute(query)
-    # query="DELETE FROM graph WHERE date = CURDATE() "
-    if not billing_table.get_children():
-        messagebox.showerror("ERROR",'Billing Table Empty')
-        return
-    if c_contacte.get()=='' or c_namee.get()=="":
-        messagebox.showerror("Error",'Please Enter The Name and Contact of the Customer')
-        return
-    try:
-        query="INSERT INTO graph (date,profit,loss,nos) VALUES (CURDATE(),0.0,0.0,0)"
-        mycursor.execute(query)
-    except:
-        messagebox.showinfo("INFO",'Press OK to Confirm')
-    
-    for row in billing_table.get_children():
-        # Extract data from the treeview
-        name_of_product = billing_table.item(row)['values'][0]
-        
-        query="select c_price from finaldbt where name=%s"
-        mycursor.execute(query,name_of_product)
-        cp=mycursor.fetchone()
-        cp_f=float(cp[0])
-        
-        query="select s_price from finaldbt where name=%s"
-        mycursor.execute(query,name_of_product)
-        sp=mycursor.fetchone()
-        sp_f=float(sp[0])
-        
-        
-        query="select quantity from finaldbt where name=%s"
-        mycursor.execute(query,name_of_product)
-        pquantity=mycursor.fetchone()
-        quantint1=int(pquantity[0])
-        
-        quantity = billing_table.item(row)['values'][2]
-        quantint2=int(quantity)
-        finalquantity=quantint1-quantint2
-        profit_f=(sp_f-cp_f)*quantint2
-        # Execute SQL update statement
-        sql = "UPDATE finaldbt SET quantity = %s WHERE name = %s"
-        val = (finalquantity, name_of_product)
-        mycursor.execute(sql, val)
-        query="select profit from graph where date = CURDATE() "
-        mycursor.execute(query)
-        profit_t=mycursor.fetchone()
-        profit_tf=float(profit_t[0])
-        query="select nos from graph where date = CURDATE() "
-        mycursor.execute(query)
-        nos_t=mycursor.fetchone()
-        nos_tf=int(nos_t[0])
-        final_nos = nos_tf + 1
-        final_nos_f = final_nos
-        final_profit= profit_f + profit_tf
-        final_profit_f=float(final_profit)
-        sql = "UPDATE graph SET profit = %s WHERE date = CURDATE() "
-        val = (final_profit_f)
-        mycursor.execute(sql, val)
-        sql = "UPDATE graph SET nos = %s WHERE date = CURDATE() "
-        val = (final_nos_f)
-        mycursor.execute(sql, val)
-    con.commit()    
-    fetch_data()    
-    con.close()
-    messagebox.showinfo('Sucsess',' Product SOLD')
-    clear_entryfield
-    for item in billing_table.get_children():
-        billing_table.delete(item)
-    
-def delete_details():
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
-    mycursor= con.cursor()
-    query='use crud'
-    mycursor.execute(query)
-    # Get the currently selected item
-    selected_item = billing_table.focus()
-    # Delete the selected item
-    if selected_item:
-        billing_table.delete(selected_item)
-    messagebox.showinfo('Sucsess',' Item DELETED Successfully')
-
-    
-def generate_invoice():
-    if c_contacte.get()=='' or c_namee.get()=="":
-        messagebox.showerror("Error",'Please Enter The Name and Contact of the Customer')
-        return
-    doc = DocxTemplate("miniproject.docx")
-    i_name= c_namee.get()
-    i_contact= c_contacte.get()
-    data = []
-    for item in billing_table.get_children():
-        values = billing_table.item(item, 'values')
-        data.append(list(values))
-    # Assuming item[5] contains string representations of numbers
-    subtotal = sum(float(item[5]) for item in data)
-    salestax = 0.18   #18%
-    subttotal = subtotal * (1 + salestax)
-    doc.render({"name":i_name,
-                "phone":i_contact,
-                "invoice_list":data,
-                "subtotal":subtotal,
-                "salestax":"18%",
-                "total":subttotal})
-    doc_name = "new_invoice" + str(i_name) + datetime.datetime.now().strftime("%Y-%m-%d-%H%M%S") + ".docx"
-    doc.save(doc_name)
-    messagebox.showinfo("Invoice Complete", "Invoice Complete")
-    data.clear
-        
 def clear_entryfield():
     quan.delete(0,END)
     name.delete(0,END)
     stotal.delete(0,END)
     sp.delete(0,END)
     exd.delete(0,END)
-    updatequantity.delete(0,END)
+
+
+    
+
+
+    
+
         
 def add_details():
+    global billing_table
     try:
         con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
         mycursor= con.cursor()
@@ -233,6 +353,11 @@ def add_details():
    # billing_table.insert("", "end", values=(namev,sellingp,quantityv,discountv,date,total))
     product_table.selection_remove(product_table.selection())
     messagebox.showinfo('Sucsess',' Item ADDED Successfully')
+    
+    
+    
+
+    
     
     clear_entryfield()
 
@@ -343,43 +468,7 @@ def get_cursor2(event=''):
     stotal.insert(0,rowss[5])
     exd.insert(0,rowss[4])  
    
-def update_details():
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
-    mycursor= con.cursor()
-    query='use crud'
-    mycursor.execute(query)
-    # Get the currently selected item
-    selected_item = billing_table.focus()
-    query="select discount from finaldbt where name=%s"
-    mycursor.execute(query,name.get())
-    discountv=mycursor.fetchone()
-    if updatequantity.get()=='':
-        messagebox.showerror("Error",'Please Enter The Quantity')
-        return
-    namev=name.get()
-    quantityv=updatequantity.get()
-    query="select quantity from finaldbt where name=%s"
-    mycursor.execute(query,name.get())
-    quantityq=mycursor.fetchone()
-    quantint=int(quantityq[0])
-    quantinte=int(quantityv)
-    if quantint < quantinte :
-        messagebox.showerror('Error','NOT ENOUGH STOCK(REENTER QUANTITY)')
-        return
-    query="select discount from finaldbt where name=%s"
-    mycursor.execute(query,name.get())
-    discountv=mycursor.fetchone()
-    sellingp=sp.get()
-    query="select ex_date from finaldbt where name=%s"
-    mycursor.execute(query,name.get())
-    date=mycursor.fetchone()
-    total=float(quantityv) * float(sellingp)
-    # Update the values of the selected item
-    if selected_item:
-        billing_table.item(selected_item, values=(namev, sp.get(), updatequantity.get(),discountv,date,total))
-    billing_table.selection_remove(billing_table.selection())
-    messagebox.showinfo('Sucsess',' Item UPDATED Successfully')
-    clear_entryfield() 
+ 
     
 def deselect(event=None):                   ##addkr
     selected_item = product_table.selection()
@@ -413,20 +502,7 @@ searchb.place(x=500,y=265)
 
 outputframe1=Frame(mwindow,bd=10,relief=GROOVE)
 outputframe1.place(x=700,y=265,width=600,height=100)
-outputframe2=Frame(mwindow,bd=10,relief=RIDGE)
-outputframe2.place(x=20,y=400,width=1400,height=200)
-outputframe3=Frame(mwindow,bd=4,relief=RIDGE,pady=6)
-outputframe3.place(x=800,y=620,height=80,width=400)
 
-c_namel=Label(outputframe3,text='Name of customer:',bd=0)
-c_namel.grid(row=0,column=0,padx=20)
-c_namee = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
-c_namee.grid(row=0,column=1)
-
-c_contactl=Label(outputframe3,text='Customer contact:',bd=0)
-c_contactl.grid(row=1,column=0,padx=20)
-c_contacte = Entry(outputframe3,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
-c_contacte.grid(row=1,column=1)
 
 product_table=ttk.Treeview(outputframe,columns=("name_of_product","sellingprice","quantity","sellingpricetotal","discount","exdate"))
 vsbp = ttk.Scrollbar(outputframe, orient="vertical", command=product_table.yview)
@@ -486,48 +562,7 @@ add.place(x=300,y=52)
 clear=Button(outputframe1,width=10,padx=12,pady=0,text='CLEAR',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=clear_entryfield)
 clear.place(x=420,y=52)
 
-update=Button(mwindow,width=15,pady=7,text='UPDATE',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=update_details)
-update.place(x=50,y=610)
-updatequantity=Entry(mwindow,width=15,fg='black',border=2,bg="white",font=('Microsoft Yahei UI',10))
-updatequantity.place(x=180,y=620)
-
-delete=Button(mwindow,width=15,pady=7,text='delete',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=delete_details)
-delete.place(x=425,y=610)
-
-print=Button(mwindow,width=15,pady=7,text='print',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=generate_invoice)
-print.place(x=1237,y=630)
-
-billing_table=ttk.Treeview(outputframe2,columns=("name_of_product","sellingprice","quantity","discount","exdate","total"))
-
-vsbb = ttk.Scrollbar(outputframe2, orient="vertical", command=billing_table.yview)
-vsbb.pack(side="right", fill="y")
-billing_table.configure(yscrollcommand=vsbb.set)
-
-hsbb = ttk.Scrollbar(outputframe2, orient="horizontal", command=billing_table.xview)
-hsbb.pack(side="bottom", fill="x")
-billing_table.configure(xscrollcommand=hsbb.set)
-
-billing_table.heading("name_of_product",text="PRODUCT")
-billing_table.heading("sellingprice",text="SELLING PRICE")
-billing_table.heading("quantity",text="QUANTITY") 
-billing_table.heading("total",text="TOTAL") 
-billing_table.heading("discount",text="DISCOUNT") 
-billing_table.heading("exdate",text="EXPIRY DATE") 
-
-billing_table["show"]="headings"
-billing_table.column("name_of_product",width=100)
-billing_table.column("sellingprice",width=75)
-billing_table.column("quantity",width=50)
-billing_table.column("total",width=75)
-billing_table.column("discount",width=50)
-billing_table.column("exdate",width=75)
-billing_table.pack(fill=BOTH,expand=1)
-
-billing_table.bind("<ButtonRelease-1>",get_cursor2)
-fetch_data()
-
-sell=Button(mwindow,width=15,pady=7,text='sell',bg='#006666',activebackground='#006666',activeforeground='white',fg='white',command=sell_detail)
-sell.place(x=1237,y=670)
 back=Button(mwindow,width=20,pady=7,text='DASHBOARD',bg='#013f45',activebackground='#006666',activeforeground='white',fg='white',border=1,command=backtodashboard).place(x=600,y=680)
+bill=Button(mwindow,width=20,pady=7,text='BILL',bg='#013f45',activebackground='#006666',activeforeground='white',fg='white',border=1,command=open_bill_windo).place(x=800,y=700)
 
 mwindow.mainloop()
