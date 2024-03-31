@@ -1,3 +1,7 @@
+import tkinter as tk
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+
 import matplotlib.pyplot as plt
 from tkinter import *
 from tkinter import messagebox
@@ -6,13 +10,6 @@ from PIL import Image,ImageTk
 import pymysql
 from tkcalendar import Calendar
 import tkinter as tk
-
-
-import tkinter as tk
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-
-
 # Connect to your MySQL database
 # mydb = mysql.connector.connect(
 #     host="localhost",
@@ -20,11 +17,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 #     password="travelmanagement",
 #     database="crud"
 # )
-<<<<<<< HEAD
-con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
-=======
 con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
->>>>>>> d15b1de9632ba15803a31e97380e8e42722aea3d
 mycursor= con.cursor()
     
 query='use crud'
@@ -44,15 +37,11 @@ dates = [row[0] for row in result]
 nos = [row[1] for row in result]
 
 # Plot the data
-plt.figure(figsize=(8, 5))
+plt.figure(figsize=(10, 6))
 plt.plot(dates, nos, marker='o', linestyle='-')
 plt.title('Number of No Of Sales over Time')
 plt.xlabel('Date')
 plt.ylabel('Number of NOS')
 plt.xticks(rotation=45)  # Rotate x-axis labels for better readability
 plt.tight_layout()
-<<<<<<< HEAD
 plt.show()
-=======
-plt.show()
->>>>>>> d15b1de9632ba15803a31e97380e8e42722aea3d

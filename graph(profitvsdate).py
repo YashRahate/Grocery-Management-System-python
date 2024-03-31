@@ -11,8 +11,6 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import matplotlib.pyplot as plt
 from collections import defaultdict
 
-
-
 # Connect to your MySQL database
 # mydb = mysql.connector.connect(
 #     host="localhost",
@@ -54,7 +52,7 @@ dates = list(date_profit_sum.keys())
 profit_sums = list(date_profit_sum.values())
 
 # Plot the data
-plt.figure(figsize=(8, 6))
+plt.figure(figsize=(10, 6))
 plt.plot(dates, profit_sums, marker='o', linestyle='-')
 plt.title('Total Profit over Time')
 plt.xlabel('Date')

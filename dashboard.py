@@ -13,14 +13,22 @@ window.resizable(False,False)
 def add_open():
     window.destroy()
     import add
-
-def pro_open():
+def outofstock_open():
     window.destroy()
-    import profile
-
+    import outofstock
+def sellbackend_open():
+    window.destroy()
+    import sellbackend
+def expirydate_open():
+    window.destroy()
+    import expirydate
 def graph_open():
     window.destroy()
     import graph1
+
+def pro_open():
+    window.destroy()
+    import profileofuser
 
 bgOriginal = Image.open('newbg.png').resize((925,500))
         # bgImage = ImageTk.PhotoImage(bgOriginal)
@@ -31,7 +39,7 @@ Label(window,image=img,border=0,bg='white').place(x=0,y=0)
 
 bgOriginal1 = Image.open('profile.png').resize((275,155))
 img1 =ImageTk.PhotoImage(bgOriginal1)
-profile=Button(window,image=img1,border=10,bg='teal',activebackground='#356466', command=pro_open).place(x=15,y=55) 
+profile=Button(window,image=img1,border=10,bg='teal',activebackground='#356466',command=pro_open).place(x=15,y=55) 
 
 
 bgOriginal2 = Image.open('add1.png').resize((275,155))
@@ -44,19 +52,19 @@ add=Button(window,image=img2,border=10,bg='teal',activebackground='#356466',comm
 
 bgOriginal3 = Image.open('stocks.png').resize((275,155))
 img3 =ImageTk.PhotoImage(bgOriginal3)
-Button(window,image=img3,border=10,bg='teal',activebackground='#356466').place(x=625,y=55)
+Button(window,image=img3,border=10,bg='teal',activebackground='#356466',command=outofstock_open).place(x=625,y=55)
 
 bgOriginal4 = Image.open('stats.png').resize((275,155))
 img4 =ImageTk.PhotoImage(bgOriginal4)
-Button(window,image=img4,border=10,bg='teal',activebackground='#356466',command = graph_open).place(x=15,y=265)
+Button(window,image=img4,border=10,bg='teal',activebackground='#356466',command=graph_open).place(x=15,y=265)
 
 bgOriginal5 = Image.open('bill.png').resize((275,155))
 img5 =ImageTk.PhotoImage(bgOriginal5)
-Button(window,image=img5,border=10,bg='teal',activebackground='#356466').place(x=320,y=265)
+Button(window,image=img5,border=10,bg='teal',activebackground='#356466',command=sellbackend_open).place(x=320,y=265)
 
 bgOriginal6 = Image.open('exp.png').resize((275,155))
 img6 =ImageTk.PhotoImage(bgOriginal6)
-Button(window,image=img6,border=10,bg='teal',activebackground='#356466').place(x=625,y=265)
+Button(window,image=img6,border=10,bg='teal',activebackground='#356466',command=expirydate_open).place(x=625,y=265)
 
 # Button(window,width=50,pady=7,image='user.png',bg='#006666',fg='white',border=0).place(x=35,y=204)
 # Button(window,width=50,pady=7,image='add.png',bg='#006666',fg='white',border=0).place(x=95,y=204)
