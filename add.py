@@ -13,7 +13,7 @@ window.geometry('925x500+185+85')
 window.configure(bg='#fff')
 window.resizable(False,False)
 
-bgOriginal = Image.open('fruits.png').resize((925,500))
+bgOriginal = Image.open('newbg.png').resize((925,500))
         # bgImage = ImageTk.PhotoImage(bgOriginal)
         # bgLabel=Label(fwindow,image=bgImage)
         # bgLabel.place(x=0,y=0)
@@ -108,7 +108,7 @@ frame=Frame(window,width=850,height=225,bg="white")
 frame.place(x=50,y=30)
 
 def update_details():
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+    con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
     mycursor= con.cursor()
     
     query='use crud'
@@ -127,7 +127,7 @@ def update_details():
     con.commit()
     fetch_data()
     con.close()
-    messagebox.showinfo('Sucsess',' Item UPDATED Successfully')
+    messagebox.showinfo('Success',' Item UPDATED Successfully')
     clearentryfields()
     window.focus()
 
@@ -137,7 +137,7 @@ def get_cursor(event=''):
     
     delete=Button(window,width=20,pady=7,text='DELETE',bg='#013f45',activebackground='#006666',activeforeground='white',fg='white',border=1,command=delete_details).place(x=550,y=460)
    
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+    con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
     mycursor= con.cursor()
     
     query='use crud'
@@ -158,7 +158,7 @@ def get_cursor(event=''):
 
 def add_details():
     try:
-        con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+        con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
         mycursor= con.cursor()
     except:
         messagebox.showerror("Error",'Connection Failed With Database')
@@ -192,12 +192,12 @@ def add_details():
         con.commit()
         fetch_data()
         con.close()
-        messagebox.showinfo('Sucsess',' Item Added Successfully')
+        messagebox.showinfo('Success',' Item Added Successfully')
         clearentryfields()
         window.focus()
 
 def delete_details():
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+    con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
     mycursor= con.cursor()
     
     query='use crud'
@@ -216,7 +216,7 @@ def delete_details():
     fetch_data()
     
     con.close()
-    messagebox.showinfo('Sucsess',' Item DELETED Successfully')
+    messagebox.showinfo('Success',' Item DELETED Successfully')
     clearentryfields()
     window.focus()
 
@@ -261,7 +261,7 @@ product_table.pack(fill=BOTH,expand=1)
 product_table.bind("<ButtonRelease-1>",get_cursor)
 
 def fetch_data():
-    con=pymysql.connect(host='localhost',user='root',password='travelmanagement')
+    con=pymysql.connect(host='localhost',user='root',password='Shar@2004')
     mycursor= con.cursor()
     
     query='use crud'
